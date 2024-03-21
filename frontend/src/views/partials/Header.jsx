@@ -7,7 +7,7 @@ function Header() {
             <nav className="navbar navbar-expand-lg">
                 <div className="container">
                     <Link className="navbar-brand" to="/">
-                        <img className="navbar-brand-item dark-mode-item" src="public/logo.png" style={{ width: "200px" }} alt="logo" />
+                        <img className="navbar-brand-item dark-mode-item" src="https://i.postimg.cc/ZRNC1mhM/my-main-logo.png" style={{ width: "200px" }} alt="logo" />
                     </Link>
                     <button className="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                         <span className="h6 d-none d-sm-inline-block text-white">Menu</span>

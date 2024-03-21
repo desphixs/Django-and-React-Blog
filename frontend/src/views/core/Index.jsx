@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
+import { Link } from "react-router-dom";
 function Index() {
     return (
         <div>
@@ -29,9 +29,9 @@ function Index() {
                                 </div>
                                 <div className="card-body px-3 pt-3">
                                     <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
+                                        <Link to={`/7-common-mistakes-everyone-makes-while-travelling/`} className="btn-link text-reset stretched-link fw-bold text-decoration-none">
                                             7 common mistakes everyone makes while traveling
-                                        </a>
+                                        </Link>
                                     </h4>
                                     <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
                                         <li>
