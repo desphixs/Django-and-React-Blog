@@ -26,24 +26,29 @@ function Header() {
                         </div>
                         <ul className="navbar-nav navbar-nav-scroll ms-auto">
                             <li className="nav-item dropdown">
-                                <Link className="nav-link active" to="/" id="homeMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <Link className="nav-link active" to="/">
                                     Home
                                 </Link>
                             </li>
                             <li className="nav-item dropdown">
-                                <a className="nav-link dropdown-toggle" href="#" id="pagesMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <Link className="nav-link active" to="/category/">
+                                    Category
+                                </Link>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle active" href="#" id="pagesMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Pages
                                 </a>
                                 <ul className="dropdown-menu" aria-labelledby="pagesMenu">
                                     <li>
-                                        <a className="dropdown-item" href="about-us.html">
+                                        <Link className="dropdown-item" to="/about/">
                                             About
-                                        </a>
+                                        </Link>
                                     </li>
                                     <li>
-                                        <a className="dropdown-item" href="contact-us.html">
+                                        <Link className="dropdown-item" to="/contact/">
                                             Contact
-                                        </a>
+                                        </Link>
                                     </li>
                                 </ul>
                             </li>
