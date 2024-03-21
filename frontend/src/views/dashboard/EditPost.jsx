@@ -18,8 +18,8 @@ function AddPost() {
                                             <div className="offset-lg-1 col-lg-10 col-md-12 col-12">
                                                 <div className="d-lg-flex align-items-center justify-content-between">
                                                     <div className="mb-4 mb-lg-0">
-                                                        <h1 className="text-white mb-1">Create Blog Post</h1>
-                                                        <p className="mb-0 text-white lead">Use the article builder below to write your article.</p>
+                                                        <h1 className="text-white mb-1">Edit Blog Post</h1>
+                                                        <p className="mb-0 text-white lead">Use the article builder below to edit your article.</p>
                                                     </div>
                                                     <div>
                                                         <Link to="/instructor/posts/" className="btn" style={{ backgroundColor: "white" }}>
@@ -81,7 +81,7 @@ function AddPost() {
                                         </div>
                                     </div>
                                     <button className="btn btn-lg btn-success w-100 mt-2" type="button">
-                                        Create Post <i className="fas fa-check-circle"></i>
+                                        Update Post <i className="fas fa-check-circle"></i>
                                     </button>
                                 </section>
                             </>

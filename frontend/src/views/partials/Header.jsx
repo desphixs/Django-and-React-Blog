@@ -18,9 +18,9 @@ function Header() {
                             <div className="nav-item w-100">
                                 <form className="rounded position-relative">
                                     <input className="form-control pe-5 bg-light" type="search" placeholder="Search Articles" aria-label="Search" />
-                                    <button className="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y" type="submit">
+                                    <Link to={"/search/"} className="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y" type="submit">
                                         <i className="bi bi-search fs-5"> </i>
-                                    </button>
+                                    </Link>
                                 </form>
                             </div>
                         </div>
@@ -42,12 +42,12 @@ function Header() {
                                 <ul className="dropdown-menu" aria-labelledby="pagesMenu">
                                     <li>
                                         <Link className="dropdown-item" to="/about/">
-                                            About
+                                            <i className="bi bi-person-lines-fill"></i> About
                                         </Link>
                                     </li>
                                     <li>
                                         <Link className="dropdown-item" to="/contact/">
-                                            Contact
+                                            <i className="bi bi-telephone-fill"></i> Contact
                                         </Link>
                                     </li>
                                 </ul>
@@ -59,37 +59,32 @@ function Header() {
                                 <ul className="dropdown-menu" aria-labelledby="pagesMenu">
                                     <li>
                                         <Link className="dropdown-item" to="/dashboard/">
-                                            Dashboard
+                                            <i className="fas fa-user"></i> Dashboard
                                         </Link>
                                     </li>
                                     <li>
                                         <Link className="dropdown-item" to="/posts/">
-                                            Posts
+                                            <i className="bi bi-grid-fill"></i> Posts
                                         </Link>
                                     </li>
                                     <li>
                                         <Link className="dropdown-item" to="/add-post/">
-                                            Add Post
+                                            <i className="fas fa-plus-circle"></i> Add Post
                                         </Link>
                                     </li>
                                     <li>
                                         <Link className="dropdown-item" to="/comments/">
-                                            Comments
+                                            <i className="bi bi-chat-left-quote-fill"></i> Comments
                                         </Link>
                                     </li>
                                     <li>
                                         <Link className="dropdown-item" to="/notifications/">
-                                            Notifications
+                                            <i className="fas fa-bell"></i> Notifications
                                         </Link>
                                     </li>
                                     <li>
                                         <Link className="dropdown-item" to="/profile/">
-                                            Profile
-                                        </Link>
-                                    </li>
-                                    <li>
-                                        <Link className="dropdown-item" to="/settings/">
-                                            Settings
+                                            <i className="fas fa-user-gear"></i> Profile
                                         </Link>
                                     </li>
                                 </ul>
