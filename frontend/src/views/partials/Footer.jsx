@@ -14,7 +14,7 @@ function Footer() {
                     </div>
                 </div>
                 <div className="col-md-3 mb-3 mb-md-0">
-                    <img src="/public/logo.png" style={{ width: "200px" }} alt="footer logo" />
+                    <img src="/logo.png" style={{ width: "200px" }} alt="footer logo" />
                 </div>
                 <div className="col-md-4">
                     <ul className="nav text-primary-hover justify-content-center justify-content-md-end">

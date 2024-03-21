@@ -52,10 +52,47 @@ function Header() {
                                     </li>
                                 </ul>
                             </li>
-                            <li className="nav-item">
-                                <a className="nav-link active" href="dashboard.html">
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle active" href="#" id="pagesMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Dashboard
                                 </a>
+                                <ul className="dropdown-menu" aria-labelledby="pagesMenu">
+                                    <li>
+                                        <Link className="dropdown-item" to="/dashboard/">
+                                            Dashboard
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/posts/">
+                                            Posts
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/add-post/">
+                                            Add Post
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/comments/">
+                                            Comments
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/notifications/">
+                                            Notifications
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/profile/">
+                                            Profile
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link className="dropdown-item" to="/settings/">
+                                            Settings
+                                        </Link>
+                                    </li>
+                                </ul>
                             </li>
                             <li className="nav-item">
                                 <Link to={"/register/"} className="btn btn-success" href="dashboard.html">

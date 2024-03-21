@@ -10,6 +10,7 @@ import Login from "./views/auth/Login";
 import Logout from "./views/auth/Logout";
 import ForgotPassword from "./views/auth/ForgotPassword";
 import CreatePassword from "./views/auth/CreatePassword";
+import Dashboard from "./views/dashboard/Dashboard";
 
 function App() {
     return (
@@ -26,6 +27,9 @@ function App() {
                     <Route path="/logout/" element={<Logout />} />
                     <Route path="/forgot-password/" element={<ForgotPassword />} />
                     <Route path="/create-password/" element={<CreatePassword />} />
+
+                    {/* Dashboard */}
+                    <Route path="/dashboard/" element={<Dashboard />} />
 
                     {/* Pages */}
                     <Route path="/about/" element={<About />} />
