@@ -1,9 +1,71 @@
-import React from 'react'
+import React from "react";
+import { Link } from "react-router-dom";
 
 function Header() {
-  return (
-    <div>Header</div>
-  )
+    return (
+        <header className="navbar-dark bg-dark navbar-sticky header-static">
+            <nav className="navbar navbar-expand-lg">
+                <div className="container">
+                    <Link className="navbar-brand" to="/">
+                        <img className="navbar-brand-item dark-mode-item" src="public/logo.png" style={{ width: "200px" }} alt="logo" />
+                    </Link>
+                    <button className="navbar-toggler ms-auto" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+                        <span className="h6 d-none d-sm-inline-block text-white">Menu</span>
+                        <span className="navbar-toggler-icon" />
+                    </button>
+                    <div className="collapse navbar-collapse" id="navbarCollapse">
+                        <div className="nav mt-3 mt-lg-0 px-4 flex-nowrap align-items-center">
+                            <div className="nav-item w-100">
+                                <form className="rounded position-relative">
+                                    <input className="form-control pe-5 bg-light" type="search" placeholder="Search Articles" aria-label="Search" />
+                                    <button className="btn bg-transparent border-0 px-2 py-0 position-absolute top-50 end-0 translate-middle-y" type="submit">
+                                        <i className="bi bi-search fs-5"> </i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <ul className="navbar-nav navbar-nav-scroll ms-auto">
+                            <li className="nav-item dropdown">
+                                <Link className="nav-link active" to="/" id="homeMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Home
+                                </Link>
+                            </li>
+                            <li className="nav-item dropdown">
+                                <a className="nav-link dropdown-toggle" href="#" id="pagesMenu" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Pages
+                                </a>
+                                <ul className="dropdown-menu" aria-labelledby="pagesMenu">
+                                    <li>
+                                        <a className="dropdown-item" href="about-us.html">
+                                            About
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className="dropdown-item" href="contact-us.html">
+                                            Contact
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li className="nav-item">
+                                <a className="nav-link active" href="dashboard.html">
+                                    Dashboard
+                                </a>
+                            </li>
+                            <li className="nav-item">
+                                <Link to={"/register/"} className="btn btn-success" href="dashboard.html">
+                                    Register <i className="fas fa-user-plus"></i>
+                                </Link>
+                                <Link to={"/login/"} className="btn btn-success ms-2" href="dashboard.html">
+                                    Login <i className="fas fa-sign-in-alt"></i>
+                                </Link>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+        </header>
+    );
 }
 
-export default Header
+export default Header;
