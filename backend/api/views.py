@@ -380,3 +380,75 @@ class DashboardPostCommentAPIView(APIView):
         comment.save()
 
         return Response({"message": "Comment Response Sent"}, status=status.HTTP_201_CREATED)
+    
+class DashboardPostCreateAPIView(generics.CreateAPIView):
+    serializer_class = api_serializer.PostSerializer
+    permission_classes = [AllowAny]
+
+    def create(self, request, *args, **kwargs):
+        user_id = request.data.get('user_id')
+        title = request.data.get('title')
+        image = request.data.get('image')
+        description = request.data.get('description')
+        tags = request.data.get('tags')
+        category_id = request.data.get('category')
+        post_status = request.data.get('post_status')
+
+        user = api_models.User.objects.get(id=user_id)
+        category = api_models.Category.objects.get(id=category_id)
+
+        post = api_models.Post.objects.create(
+            user=user,
+            title=title,
+            image=image,
+            description=description,
+            tags=tags,
+            category=category,
+            status=post_status
+        )
+
+        return Response({"message": "Post Created Successfully"}, status=status.HTTP_201_CREATED)
+
+
+
+class DashboardPostEditAPIView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = api_serializer.PostSerializer
+    permission_classes = [AllowAny]
+
+    def get_object(self):
+        user_id = self.kwargs['user_id']
+        post_id = self.kwargs['post_id']
+        user = api_models.User.objects.get(id=user_id)
+        return api_models.Post.objects.get(user=user, id=post_id)
+
+    def update(self, request, *args, **kwargs):
+        post_instance = self.get_object()
+
+        title = request.data.get('title')
+        image = request.data.get('image')
+        description = request.data.get('description')
+        tags = request.data.get('tags')
+        category_id = request.data.get('category_id')
+        post_status = request.data.get('post_status')
+
+        category = api_models.Category.objects.get(id=category_id)
+
+        post_instance.title = title
+        post_instance.image = image
+        post_instance.description = description
+        post_instance.tags = tags
+        post_instance.category = category
+        post_instance.status = post_status
+        post_instance.save()
+
+        return Response({"message": "Post Updated Successfully"}, status=status.HTTP_200_OK)
+
+
+{
+    "title": "New post",
+    "image": "",
+    "description": "lorem",
+    "tags": "tags, here",
+    "category_id": 1,
+    "post_status": "Active"
+}

@@ -5,6 +5,7 @@ from django.utils.html import mark_safe
 from django.utils.text import slugify
 
 from shortuuid.django_fields import ShortUUIDField
+import shortuuid
 
 class User(AbstractUser):
     username = models.CharField(unique=True, max_length=100)
@@ -106,9 +107,8 @@ class Post(models.Model):
         verbose_name_plural = "Post"
 
     def save(self, *args, **kwargs):
-        super(Post, self).save(*args, **kwargs)
         if self.slug == "" or self.slug == None:
-            self.slug = slugify(self.title) + str(self.pk)
+            self.slug = slugify(self.title) + "-" + shortuuid.uuid()[:2]
         super(Post, self).save(*args, **kwargs)
 
 class Comment(models.Model):
