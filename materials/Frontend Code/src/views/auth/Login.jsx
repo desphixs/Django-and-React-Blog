@@ -1,48 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
-import { useParams, Link, useNavigate } from "react-router-dom";
-
-import apiInstance from "../../utils/axios";
-import { useAuthStore } from "../../store/auth";
-import { login, register } from "../../utils/auth";
+import { Link } from "react-router-dom";
 
 function Login() {
-    const [bioData, setBioData] = useState({ email: "", password: "" });
-    const [isLoading, setIsLoading] = useState(false);
-    const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
-    const navigate = useNavigate();
-
-    const handleBioDataChange = (event) => {
-        setBioData({
-            ...bioData,
-            [event.target.name]: event.target.value,
-        });
-    };
-
-    const resetForm = () => {
-        setBioData({
-            email: "",
-            password: "",
-        });
-    };
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setIsLoading(true);
-
-        const { error } = await login(bioData.email, bioData.password);
-        if (error) {
-            alert(JSON.stringify(error));
-            resetForm();
-        } else {
-            navigate("/");
-        }
-
-        // Reset isLoading to false when the operation is complete
-        setIsLoading(false);
-    };
-
     return (
         <>
             <Header />
@@ -61,13 +22,13 @@ function Login() {
                                     </span>
                                 </div>
                                 {/* Form */}
-                                <form className="needs-validation" noValidate="" onSubmit={handleLogin}>
+                                <form className="needs-validation" noValidate="">
                                     {/* Username */}
                                     <div className="mb-3">
                                         <label htmlFor="email" className="form-label">
                                             Email Address
                                         </label>
-                                        <input type="email" onChange={handleBioDataChange} value={bioData.email} id="email" className="form-control" name="email" placeholder="johndoe@gmail.com" required="" />
+                                        <input type="email" id="email" className="form-control" name="email" placeholder="johndoe@gmail.com" required="" />
                                         <div className="invalid-feedback">Please enter valid username.</div>
                                     </div>
                                     {/* Password */}
@@ -75,7 +36,7 @@ function Login() {
                                         <label htmlFor="password" className="form-label">
                                             Password
                                         </label>
-                                        <input type="password" onChange={handleBioDataChange} value={bioData.password} id="password" className="form-control" name="password" placeholder="**************" required="" />
+                                        <input type="password" id="password" className="form-control" name="password" placeholder="**************" required="" />
                                         <div className="invalid-feedback">Please enter valid password.</div>
                                     </div>
                                     {/* Checkbox */}
@@ -93,18 +54,8 @@ function Login() {
                                     </div>
                                     <div>
                                         <div className="d-grid">
-                                            <button className="btn btn-primary w-100" type="submit" disabled={isLoading}>
-                                                {isLoading ? (
-                                                    <>
-                                                        <span className="mr-2 ">Processing...</span>
-                                                        <i className="fas fa-spinner fa-spin" />
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <span className="mr-2">Sign In </span>
-                                                        <i className="fas fa-sign-in-alt" />
-                                                    </>
-                                                )}
+                                            <button type="submit" className="btn btn-primary">
+                                                Sign in <i className="fas fa-sign-in-alt"></i>
                                             </button>
                                         </div>
                                     </div>

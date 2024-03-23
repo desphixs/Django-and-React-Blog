@@ -100,6 +100,7 @@ class PasswordEmailVerify(generics.RetrieveAPIView):
             msg.attach_alternative(html_body, "text/html")
             msg.send()
         return user
+    
 
 class PasswordChangeView(generics.CreateAPIView):
     permission_classes = (AllowAny,)
@@ -110,26 +111,17 @@ class PasswordChangeView(generics.CreateAPIView):
         
         otp = payload['otp']
         uidb64 = payload['uidb64']
-        reset_token = payload['reset_token']
         password = payload['password']
-
-        print("otp ======", otp)
-        print("uidb64 ======", uidb64)
-        print("reset_token ======", reset_token)
-        print("password ======", password)
 
         user = api_models.User.objects.get(id=uidb64, otp=otp)
         if user:
             user.set_password(password)
             user.otp = ""
-            user.reset_token = ""
             user.save()
-
             
             return Response( {"message": "Password Changed Successfully"}, status=status.HTTP_201_CREATED)
         else:
             return Response( {"message": "An Error Occured"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
 
 ######################## Post APIs ########################
         
