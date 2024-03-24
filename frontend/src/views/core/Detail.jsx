@@ -1,9 +1,64 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+
+import apiInstance from "../../utils/axios";
+import moment from "moment";
+import Toast from "../../plugin/Toast";
 
 function Detail() {
+    const [post, setPost] = useState([]);
+    const [tags, setTags] = useState([]);
+    const [createComment, setCreateComment] = useState({ full_name: "", email: "", comment: "" });
+
+    const param = useParams();
+
+    const fetchPost = async () => {
+        const response = await apiInstance.get(`post/detail/${param.slug}/`);
+        setPost(response.data);
+
+        const tagArray = response.data?.tags?.split(",");
+        setTags(tagArray);
+    };
+
+    useEffect(() => {
+        fetchPost();
+    }, []);
+
+    const handleCreateCommentChange = (event) => {
+        setCreateComment({
+            ...createComment,
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    const handleCreateCommentSubmit = async (e) => {
+        e.preventDefault();
+
+        console.log(post.id);
+        console.log(createComment.full_name);
+        console.log(createComment.email);
+        console.log(createComment.comment);
+
+        const jsonData = {
+            post_id: post?.id,
+            name: createComment.full_name,
+            email: createComment.email,
+            comment: createComment.comment,
+        };
+
+        const response = await apiInstance.post(`post/comment-post/`, jsonData);
+        console.log(response);
+        fetchPost();
+        Toast("success", "Comment Posted.", "");
+        setCreateComment({
+            full_name: "",
+            email: "",
+            comment: "",
+        });
+    };
+
     return (
         <>
             <Header />
@@ -13,9 +68,9 @@ function Detail() {
                         <div className="col-12">
                             <a href="#" className="badge bg-danger mb-2 text-decoration-none">
                                 <i className="small fw-bold " />
-                                Lifestyle
+                                {post.category?.title}
                             </a>
-                            <h1 className="text-center">10 tell-tale signs you need to get a new startup.</h1>
+                            <h1 className="text-center">{post.title}</h1>
                         </div>
                     </div>
                 </div>
@@ -28,19 +83,19 @@ function Detail() {
                             <div className="text-start text-lg-center mb-5" data-sticky="" data-margin-top={80} data-sticky-for={991}>
                                 <div className="position-relative">
                                     <div className="avatar avatar-xl">
-                                        <img className="avatar-img" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/Author.jpg" alt="avatar" />
+                                        <img className="avatar-img" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} src={post.profile?.image} alt="avatar" />
                                     </div>
                                     <a href="#" className="h5 fw-bold text-dark text-decoration-none mt-2 mb-0 d-block">
-                                        Louis Ferguson
+                                        {post.profile?.full_name}
                                     </a>
-                                    <p>Writer at Desphixs</p>
+                                    <p>{post.profile?.bio}</p>
                                 </div>
 
                                 <hr className="d-none d-lg-block " />
 
                                 <ul className="list-inline list-unstyled">
                                     <li className="list-inline-item d-lg-block my-lg-2 text-start">
-                                        <i className="fas fa-calendar"></i> Nov 15, 2022
+                                        <i className="fas fa-calendar"></i> {moment(post.date).format("DD MMM, YYYY")}
                                     </li>
                                     <li className="list-inline-item d-lg-block my-lg-2 text-start">
                                         <i className="fas fa-clock"></i> 5 min read
@@ -49,67 +104,31 @@ function Detail() {
                                         <a href="#" className="text-body">
                                             <i className="fas fa-heart me-1" />
                                         </a>
-                                        266 Likes
+                                        {post.likes?.length} Likes
                                     </li>
                                     <li className="list-inline-item d-lg-block my-lg-2 text-start">
-                                        <i className="fas fa-eye" />
-                                        344 Views
+                                        <i className="fas fa-eye me-1" />
+                                        {post.view} Views
                                     </li>
                                 </ul>
                                 {/* Tags */}
                                 <ul className="list-inline text-primary-hover mt-0 mt-lg-3 text-start">
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #agency
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #business
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #theme
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #bootstrap
-                                        </a>
-                                    </li>
-                                    <li className="list-inline-item">
-                                        <a className="text-body text-decoration-none fw-bold" href="#">
-                                            #marketing
-                                        </a>
-                                    </li>
+                                    {tags?.map((t, index) => (
+                                        <li className="list-inline-item">
+                                            <a className="text-body text-decoration-none fw-bold" href="#">
+                                                #{t}
+                                            </a>
+                                        </li>
+                                    ))}
                                 </ul>
                             </div>
                         </div>
                         {/* Left sidebar END */}
                         {/* Main Content START */}
                         <div className="col-lg-10 mb-5">
-                            <p>
-                                <b>Moonlight</b> newspaper up its enjoyment agreeable depending. Timed voice share led him to widen noisy young. At weddings believed laughing although the material does the exercise of. Up attempt offered ye civilly so sitting to. She new course gets living within
-                                Elinor joy. She rapturous suffering concealed.
-                            </p>
-                            <p>
-                                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Laborum est tenetur voluptatibus itaque dolor saepe mollitia et ratione odio nisi! Explicabo quod tempore voluptatibus perspiciatis, nihil dolorem magni, corrupti odio dignissimos ut temporibus laboriosam
-                                dolore vero repudiandae asperiores incidunt reiciendis corporis odit a maxime. Accusantium excepturi ut aliquid accusamus necessitatibus minus odit, assumenda rerum. Tempora deserunt officiis expedita, excepturi nihil, velit similique necessitatibus natus explicabo
-                                veritatis, vitae temporibus aliquam dicta ea. Nesciunt et fuga quis atque debitis. Vero nihil aperiam voluptatibus. Architecto reiciendis necessitatibus explicabo repellendus corrupti pariatur velit aperiam! Ad, numquam expedita iste labore tempore necessitatibus
-                                praesentium libero pariatur.
-                            </p>
-                            <p>
-                                <b>
-                                    <i>
-                                        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum totam quasi impedit nostrum hic consequatur! Tenetur dignissimos debitis ea ut magni laboriosam animi provident ab minima dolorem facilis minus amet culpa quam odio consectetur eos mollitia dolorum
-                                        cumque at soluta atque nam, quia eaque! Sint quisquam fuga sapiente facilis provident, ullam officia! Alias voluptates officia natus eaque voluptate illum est.
-                                    </i>
-                                </b>
-                            </p>
-                            <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Debitis, culpa mollitia nam, ipsum hic dolorum, beatae at quis ea cum id temporibus? Asperiores, atque eos voluptatibus explicabo cum voluptatum placeat.</p>
+                            <p dangerouslySetInnerHTML={{ __html: post.description }}></p>
 
-                            <div className="mt-5">
+                            {/* <div className="mt-5">
                                 <h2 className="my-3">
                                     <i className="bi bi-symmetry-vertical me-2" />
                                     Related post
@@ -179,13 +198,13 @@ function Detail() {
                                         </div>
                                     </div>
                                 </section>
-                            </div>
+                            </div> */}
 
                             <hr />
                             <div className="d-flex py-4">
                                 <a href="#">
                                     <div className="avatar avatar-xxl me-4">
-                                        <img className="avatar-img rounded-circle" src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/Author.jpg" style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
+                                        <img className="avatar-img rounded-circle" src={post.profile?.image} style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
                                     </div>
                                 </a>
                                 <div>
@@ -193,96 +212,71 @@ function Detail() {
                                         <div>
                                             <h4 className="m-0">
                                                 <a href="#" className="text-dark text-decoration-none">
-                                                    Louis Ferguson
+                                                    {post.profile?.full_name}
                                                 </a>
                                             </h4>
-                                            <small>Writer at Desphixs</small>
+                                            <small>{post.profile?.bio}</small>
                                         </div>
                                     </div>
-                                    <p className="my-2">Louis Ferguson is a senior editor for the blogzine and also reports on breaking news based in London. He has written about government, criminal justice, and the role of money in politics since 2015.</p>
+                                    <p className="my-2">{post.profile?.about}</p>
                                     {/* Social icons */}
                                     <ul className="nav">
-                                        <li className="nav-item">
-                                            <a className="nav-link ps-0 pe-2 fs-5" href="#">
-                                                <i className="fab fa-facebook-square" />
+                                        {post.profile?.facebook !== null && (
+                                            <li className="nav-item">
+                                                <a className="nav-link ps-0 pe-2 fs-5" target="_blank" href={post.facebook}>
+                                                    <i className="fab fa-facebook-square" />
+                                                </a>
+                                            </li>
+                                        )}
+                                        {post.profile?.twitter !== null && (
+                                            <a className="nav-link px-2 fs-5" target="_blank" href={post.twitter}>
+                                                <li className="nav-item">
+                                                    <i className="fab fa-twitter-square" />
+                                                </li>
                                             </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a className="nav-link px-2 fs-5" href="#">
-                                                <i className="fab fa-twitter-square" />
-                                            </a>
-                                        </li>
-                                        <li className="nav-item">
-                                            <a className="nav-link px-2 fs-5" href="#">
-                                                <i className="fab fa-linkedin" />
-                                            </a>
-                                        </li>
+                                        )}
                                     </ul>
                                 </div>
                             </div>
 
                             <div>
-                                <h3>3 comments</h3>
-                                <div className="my-4 d-flex bg-light p-3 mb-3 rounded">
-                                    <img
-                                        className="avatar avatar-md rounded-circle float-start me-3"
-                                        src="https://img.freepik.com/free-photo/front-portrait-woman-with-beauty-face_186202-6146.jpg?size=626&ext=jpg&ga=GA1.1.735520172.1710979200&semt=ais"
-                                        style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "50%" }}
-                                        alt="avatar"
-                                    />
-                                    <div>
-                                        <div className="mb-2">
-                                            <h5 className="m-0">Benny William</h5>
-                                            <span className="me-3 small">June 11, 2023.</span>
+                                <h3>{post.comments?.length} comments</h3>
+                                {post.comments?.map((c, index) => (
+                                    <div className="my-4 d-flex bg-light p-3 mb-3 rounded">
+                                        <img
+                                            className="avatar avatar-md rounded-circle float-start me-3"
+                                            src="https://as1.ftcdn.net/v2/jpg/03/53/11/00/1000_F_353110097_nbpmfn9iHlxef4EDIhXB1tdTD0lcWhG9.jpg"
+                                            style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "50%" }}
+                                            alt="avatar"
+                                        />
+                                        <div>
+                                            <div className="mb-2">
+                                                <h5 className="m-0">{c.name}</h5>
+                                                <span className="me-3 small">{moment(c.date).format("DD MMM, YYYY")}</span>
+                                            </div>
+                                            <p className="fw-bold">{c.comment}</p>
+                                            {c.reply !== null && <p className="">Reply: {c.reply}</p>}
                                         </div>
-                                        <p className="fw-bold">Thanks you very much for the post, it really helped. </p>
                                     </div>
-                                </div>
-
-                                <div className="my-4 d-flex bg-light p-3 mb-3 rounded">
-                                    <img
-                                        className="avatar avatar-md rounded-circle float-start me-3"
-                                        src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
-                                        style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "50%" }}
-                                        alt="avatar"
-                                    />
-                                    <div>
-                                        <div className="mb-2">
-                                            <h5 className="m-0">Jerry Doe</h5>
-                                            <span className="me-3 small">June 12, 2024.</span>
-                                        </div>
-                                        <p className="fw-bold">Post more of these, please. </p>
-                                    </div>
-                                </div>
-
-                                <div className="my-4 d-flex bg-light p-3 mb-3 rounded">
-                                    <img className="avatar avatar-md rounded-circle float-start me-3" src="https://www.faceapp.com/static/img/content/compare/impression-example-after@2x.jpg" style={{ width: "70px", height: "70px", objectFit: "cover", borderRadius: "50%" }} alt="avatar" />
-                                    <div>
-                                        <div className="mb-2">
-                                            <h5 className="m-0">Ken Altman</h5>
-                                            <span className="me-3 small">June 14, 2024.</span>
-                                        </div>
-                                        <p className="fw-bold">Amazing blog post, keep it up. </p>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                             {/* Comments END */}
                             {/* Reply START */}
                             <div className="bg-light p-3 rounded">
                                 <h3 className="fw-bold">Leave a reply</h3>
                                 <small>Your email address will not be published. Required fields are marked *</small>
-                                <form className="row g-3 mt-2">
+                                <form className="row g-3 mt-2" onSubmit={handleCreateCommentSubmit}>
                                     <div className="col-md-6">
                                         <label className="form-label">Name *</label>
-                                        <input type="text" className="form-control" aria-label="First name" />
+                                        <input onChange={handleCreateCommentChange} name="full_name" value={createComment.full_name} type="text" className="form-control" aria-label="First name" />
                                     </div>
                                     <div className="col-md-6">
                                         <label className="form-label">Email *</label>
-                                        <input type="email" className="form-control" />
+                                        <input onChange={handleCreateCommentChange} name="email" value={createComment.email} type="email" className="form-control" />
                                     </div>
                                     <div className="col-12">
                                         <label className="form-label">Write Comment *</label>
-                                        <textarea className="form-control" rows={4} />
+                                        <textarea onChange={handleCreateCommentChange} name="comment" value={createComment.comment} className="form-control" rows={4} />
                                     </div>
                                     <div className="col-12">
                                         <button type="submit" className="btn btn-primary">

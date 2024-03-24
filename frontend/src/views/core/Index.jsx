@@ -1,8 +1,75 @@
-import React from "react";
+import { useState, useEffect } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
 import { Link } from "react-router-dom";
+import moment from "moment";
+
+import apiInstance from "../../utils/axios";
+import useUserData from "../../plugin/useUserData";
+import Toast from "../../plugin/Toast";
+
 function Index() {
+    const [posts, setPosts] = useState([]);
+    const [popularPosts, setPopularPosts] = useState([]);
+    const [category, setCategory] = useState([]);
+
+    const fetchPosts = async () => {
+        const response = await apiInstance.get(`post/lists/`);
+        setPosts(response.data);
+    };
+
+    const fetchPopularPost = () => {
+        const sortedPopularPost = posts?.sort((a, b) => b.view - a.view);
+        setPopularPosts(sortedPopularPost);
+    };
+
+    const fetchCategory = async () => {
+        const response = await apiInstance.get(`post/category/list/`);
+        setCategory(response.data);
+    };
+
+    useEffect(() => {
+        fetchPosts();
+        fetchCategory();
+    }, []);
+
+    useEffect(() => {
+        fetchPopularPost();
+    }, [posts]);
+
+    // Pagination
+    const itemsPerPage = 4;
+    const [currentPage, setCurrentPage] = useState(1);
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const postItems = posts.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(posts.length / itemsPerPage);
+    const pageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1);
+
+    const handleLikePost = async (postId) => {
+        const jsonData = {
+            user_id: useUserData()?.user_id,
+            post_id: postId,
+        };
+        const response = await apiInstance.post(`post/like-post/`, jsonData);
+        console.log(response.data);
+        fetchPosts();
+
+        Toast("success", response.data.message, "");
+    };
+
+    const handleBookmarkPost = async (postId) => {
+        const jsonData = {
+            user_id: useUserData()?.user_id,
+            post_id: postId,
+        };
+        const response = await apiInstance.post(`post/bookmark-post/`, jsonData);
+        console.log(response.data);
+        fetchPosts();
+
+        Toast("success", response.data.message, "");
+    };
+
     return (
         <div>
             <Header />
@@ -22,140 +89,67 @@ function Index() {
             <section className="pt-4 pb-0">
                 <div className="container">
                     <div className="row">
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/kitchen-and-dining-room-P5JHHM6.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <Link to={`/7-common-mistakes-everyone-makes-while-travelling/`} className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </Link>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/black-woman-smiling-with-hands-in-hair-PMCFL93-1.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
+                        {postItems?.map((p, index) => (
+                            <div className="col-sm-6 col-lg-3" key={index}>
+                                <div className="card mb-4">
+                                    <div className="card-fold position-relative">
+                                        <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src={p.image} alt={p.title} />
+                                    </div>
+                                    <div className="card-body px-3 pt-3">
+                                        <h4 className="card-title">
+                                            <Link to={`${p.slug}`} className="btn-link text-reset stretched-link fw-bold text-decoration-none">
+                                                {p.title?.slice(0, 32) + "..."}
+                                            </Link>
+                                        </h4>
+                                        <button type="button" onClick={() => handleBookmarkPost(p.id)} style={{ border: "none", background: "none" }}>
+                                            <i className="fas fa-bookmark text-danger"></i>
+                                        </button>
+                                        <button onClick={() => handleLikePost(p.id)} style={{ border: "none", background: "none" }}>
+                                            <i className="fas fa-thumbs-up text-primary"></i>
+                                        </button>{" "}
+                                        {p.likes?.length}
+                                        <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
+                                            <li>
+                                                <a href="#" className="text-dark text-decoration-none">
+                                                    <i className="fas fa-user"></i> {p.profile?.full_name}
+                                                </a>
+                                            </li>
+                                            <li className="mt-2">
+                                                <i className="fas fa-calendar"></i> {moment(p.date).format("DD MMM, YYYY")}
+                                            </li>
+                                            <li className="mt-2">
+                                                <i className="fas fa-eye"></i> {p.view} Views
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/flat-with-touch-of-creativity-PX387LV-2.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/young-handsome-afro-black-man-going-upstairs-from-PJWPWPR-2.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
-                    <nav className="d-flex mt-2">
+                    <nav className="d-flex mt-5">
                         <ul className="pagination">
-                            <li className="">
-                                <button className="page-link text-dark fw-bold me-1 rounded">
-                                    <i className="fas fa-arrow-left me-2" />
+                            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                <button className="page-link me-1" onClick={() => setCurrentPage(currentPage - 1)}>
+                                    <i className="ci-arrow-left me-2" />
                                     Previous
                                 </button>
                             </li>
                         </ul>
                         <ul className="pagination">
-                            <li key={1} className="active">
-                                <button className="page-link text-dark fw-bold rounded">1</button>
-                            </li>
-                            <li key={2} className="ms-1">
-                                <button className="page-link text-dark fw-bold rounded">2</button>
-                            </li>
+                            {pageNumbers.map((number) => (
+                                <li key={number} className={`page-item ${currentPage === number ? "active" : ""}`}>
+                                    <button className="page-link" onClick={() => setCurrentPage(number)}>
+                                        {number}
+                                    </button>
+                                </li>
+                            ))}
                         </ul>
+
                         <ul className="pagination">
-                            <li className={`totalPages`}>
-                                <button className="page-link text-dark fw-bold ms-1 rounded">
+                            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                <button className="page-link ms-1" onClick={() => setCurrentPage(currentPage + 1)}>
                                     Next
-                                    <i className="fas fa-arrow-right ms-3 " />
+                                    <i className="ci-arrow-right ms-3" />
                                 </button>
                             </li>
                         </ul>
@@ -171,84 +165,19 @@ function Index() {
                                 <h2>Categories</h2>
                             </div>
                             <div className="d-flex flex-wrap justify-content-between">
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img className="card-img" src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/father-son-1.jpg" style={{ width: "150px", height: "80px", objectFit: "cover" }} alt="card image" />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Life Style</h5>
-                                            <small>3 Articles</small>
-                                        </div>
+                                {category?.map((c, index) => (
+                                    <div className="mt-2" key={index}>
+                                        <Link to={`/category/${c.slug}/`}>
+                                            <div className="card bg-transparent">
+                                                <img className="card-img" src={c.image} style={{ width: "150px", height: "80px", objectFit: "cover" }} alt="card image" />
+                                                <div className="d-flex flex-column align-items-center mt-3 pb-2">
+                                                    <h5 className="mb-0">{c.title}</h5>
+                                                    <small>{c.post_count} Articles</small>
+                                                </div>
+                                            </div>
+                                        </Link>
                                     </div>
-                                </div>
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img className="card-img" src="https://assets.entrepreneur.com/content/3x2/2000/1599591949-GettyImages-1174414266.jpg" style={{ width: "150px", height: "80px", objectFit: "cover" }} alt="card image" />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Entertainment</h5>
-                                            <small>1 Articles</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img
-                                            className="card-img"
-                                            src="https://imageio.forbes.com/specials-images/imageserve/5d35eacaf1176b0008974b54/2020-Chevrolet-Corvette-Stingray/0x0.jpg?format=jpg&crop=4560,2565,x790,y784,safe&width=960"
-                                            style={{ width: "150px", height: "80px", objectFit: "cover" }}
-                                            alt="card image"
-                                        />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Cars</h5>
-                                            <small>2 Articles</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img className="card-img" src="https://guardian.ng/wp-content/uploads/2019/03/sport-equipment-e1555707764770.jpeg" style={{ width: "150px", height: "80px", objectFit: "cover" }} alt="card image" />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Sports</h5>
-                                            <small>8 Articles</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img className="card-img" src="https://aliviohealth.com/wp-content/uploads/2022/07/Managing-Mental-Health-During-COVID-19.jpg" style={{ width: "150px", height: "80px", objectFit: "cover" }} alt="card image" />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Health</h5>
-                                            <small>7 Articles</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img
-                                            className="card-img"
-                                            src="https://www.realsimple.com/thmb/yla86Nr8GjRXe_9IyADQ638gPrg=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/fashion-trends-GettyImages-1457816153-d2982e954afe4b42bf5587f087da90d4.jpg"
-                                            style={{ width: "150px", height: "80px", objectFit: "cover" }}
-                                            alt="card image"
-                                        />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Fashion</h5>
-                                            <small>4 Articles</small>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="mt-2">
-                                    <div className="card bg-transparent">
-                                        <img className="card-img" src="https://insight.ng/wp-content/uploads/2022/01/andrey-suslov-shutterstock-1199480788_w400-3.png" style={{ width: "150px", height: "80px", objectFit: "cover" }} alt="card image" />
-                                        <div className="d-flex flex-column align-items-center mt-3 pb-2">
-                                            <h5 className="mb-0">Tech</h5>
-                                            <small>13 Articles</small>
-                                        </div>
-                                    </div>
-                                </div>
+                                ))}
                             </div>
                         </div>
                     </div>
@@ -262,7 +191,7 @@ function Index() {
                             <a href="#" className="d-block card-img-flash">
                                 <img src="assets/images/adv-3.png" alt="" />
                             </a>
-                            <h2 className="text-start d-block mt-1">Latest Articles 🕒</h2>
+                            <h2 className="text-start d-block mt-1">Popular Articles 🕒</h2>
                         </div>
                     </div>
                 </div>
@@ -271,229 +200,35 @@ function Index() {
             <section className="pt-4 pb-0">
                 <div className="container">
                     <div className="row">
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/cheerful-loving-couple-bakers-drinking-coffee-PCAVA6B-2.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/yellow-and-gray-industrial-office-PFDQ5CR-1.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
+                        {popularPosts?.map((p, index) => (
+                            <div className="col-sm-6 col-lg-3" key={index}>
+                                <div className="card mb-4">
+                                    <div className="card-fold position-relative">
+                                        <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src={p.image} alt={p.title} />
+                                    </div>
+                                    <div className="card-body px-3 pt-3">
+                                        <h4 className="card-title">
+                                            <Link to={`${p.slug}`} className="btn-link text-reset stretched-link fw-bold text-decoration-none">
+                                                {p.title?.slice(0, 32) + "..."}
+                                            </Link>
+                                        </h4>
+                                        <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
+                                            <li>
+                                                <a href="#" className="text-dark text-decoration-none">
+                                                    <i className="fas fa-user"></i> {p.profile?.full_name}
+                                                </a>
+                                            </li>
+                                            <li className="mt-2">
+                                                <i className="fas fa-calendar"></i> {moment(p.date).format("DD MMM, YYYY")}
+                                            </li>
+                                            <li className="mt-2">
+                                                <i className="fas fa-eye"></i> {p.view} Views
+                                            </li>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/loft-office-with-vintage-decor-PFD2JSL-1.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/glacier-ice-cave-of-iceland-PWYAVUU-1.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/kitchen-and-dining-room-P5JHHM6.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/black-woman-smiling-with-hands-in-hair-PMCFL93-1.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/flat-with-touch-of-creativity-PX387LV-2.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="col-sm-6 col-lg-3">
-                            <div className="card mb-4">
-                                <div className="card-fold position-relative">
-                                    <img className="card-img" style={{ width: "100%", height: "160px", objectFit: "cover" }} src="https://awcdn1.ahmad.works/writing/wp-content/uploads/2015/05/young-handsome-afro-black-man-going-upstairs-from-PJWPWPR-2.jpg" alt="Card image" />
-                                </div>
-                                <div className="card-body px-3 pt-3">
-                                    <h4 className="card-title">
-                                        <a href="post-single.html" className="btn-link text-reset stretched-link fw-bold text-decoration-none">
-                                            7 common mistakes everyone makes while traveling
-                                        </a>
-                                    </h4>
-                                    <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
-                                        <li>
-                                            <a href="#" className="text-dark text-decoration-none">
-                                                <i className="fas fa-user"></i> Louis Ferguson
-                                            </a>
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-calendar"></i> Mar 07, 2022
-                                        </li>
-                                        <li className="mt-2">
-                                            <i className="fas fa-eye"></i> 10 Views
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
+                        ))}
                     </div>
                     <nav className="d-flex mt-2">
                         <ul className="pagination">

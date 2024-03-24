@@ -113,6 +113,8 @@ class PasswordChangeView(generics.CreateAPIView):
         uidb64 = payload['uidb64']
         password = payload['password']
 
+        
+
         user = api_models.User.objects.get(id=uidb64, otp=otp)
         if user:
             user.set_password(password)
@@ -134,7 +136,7 @@ class CategoryListAPIView(generics.ListAPIView):
         return api_models.Category.objects.all()
 
 class PostCategoryListAPIView(generics.ListAPIView):
-    serializer_class = api_serializer.CategorySerializer
+    serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
 
     def get_queryset(self):
@@ -159,16 +161,7 @@ class PostDetailAPIView(generics.RetrieveAPIView):
         post.view += 1
         post.save()
         return post
-    
-class CommentListAPIView(generics.ListAPIView):
-    serializer_class = api_serializer.CommentSerializer
-    permission_classes = [AllowAny]
-
-    def get_queryset(self):
-        slug = self.kwargs['slug']
-        post = api_models.Post.objects.get(slug=slug, status="Active")
-        return api_models.Comment.objects.filter(post=post)
-    
+        
 class LikePostAPIView(APIView):
     @swagger_auto_schema(
         request_body=openapi.Schema(

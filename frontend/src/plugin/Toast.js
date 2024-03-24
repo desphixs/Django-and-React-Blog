@@ -1,6 +1,6 @@
 import Swal from "sweetalert2";
 
-function Toast() {
+function Toast(icon, title, text) {
     const Toast = Swal.mixin({
         toast: true,
         position: "top",
@@ -9,7 +9,11 @@ function Toast() {
         timerProgressBar: true,
     });
 
-    return Toast;
+    return Toast.fire({
+        icon: icon,
+        title: title,
+        text: text,
+    });
 }
 
 export default Toast;

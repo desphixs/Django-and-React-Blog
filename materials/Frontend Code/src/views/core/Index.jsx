@@ -33,6 +33,13 @@ function Index() {
                                             7 common mistakes everyone makes while traveling
                                         </Link>
                                     </h4>
+                                    <button style={{ border: "none", background: "none" }}>
+                                        <i className="fas fa-bookmark text-danger"></i>
+                                    </button>
+                                    <button style={{ border: "none", background: "none" }}>
+                                        <i className="fas fa-thumbs-up text-primary"></i>
+                                    </button>
+
                                     <ul className="mt-3 list-style-none" style={{ listStyle: "none" }}>
                                         <li>
                                             <a href="#" className="text-dark text-decoration-none">

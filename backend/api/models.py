@@ -37,6 +37,8 @@ class Profile(models.Model):
     about = models.TextField(null=True, blank=True)
     author = models.BooleanField(default=False)
     country = models.CharField(max_length=100, null=True, blank=True)
+    facebook = models.CharField(max_length=100, null=True, blank=True)
+    twitter = models.CharField(max_length=100, null=True, blank=True)
     date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -80,6 +82,9 @@ class Category(models.Model):
         if self.slug == "" or self.slug == None:
             self.slug = slugify(self.title)
         super(Category, self).save(*args, **kwargs)
+    
+    def post_count(self):
+        return Post.objects.filter(category=self).count()
 
 class Post(models.Model):
     STATUS = ( 
@@ -89,11 +94,12 @@ class Post(models.Model):
     )
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    profile = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
     title = models.CharField(max_length=100)
     image = models.FileField(upload_to="image", null=True, blank=True)
     description = models.TextField(null=True, blank=True)
     tags = models.CharField(max_length=100)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='posts')
     status = models.CharField(max_length=100, choices=STATUS, default="Active")
     view = models.IntegerField(default=0)
     likes = models.ManyToManyField(User, blank=True, related_name="likes_user")
@@ -110,7 +116,11 @@ class Post(models.Model):
         if self.slug == "" or self.slug == None:
             self.slug = slugify(self.title) + "-" + shortuuid.uuid()[:2]
         super(Post, self).save(*args, **kwargs)
+    
+    def comments(self):
+        return Comment.objects.filter(post=self).order_by("-id")
 
+    
 class Comment(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
@@ -150,7 +160,7 @@ class Notification(models.Model):
         verbose_name_plural = "Notification"
     
     def __str__(self):
-        if self.order:
+        if self.post:
             return f"{self.type} - {self.post.title}"
         else:
             return "Notification"

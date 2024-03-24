@@ -28,7 +28,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Index />} />
                         <Route path="/:slug/" element={<Detail />} />
-                        <Route path="/category/" element={<Category />} />
+                        <Route path="/category/:slug/" element={<Category />} />
                         <Route path="/search/" element={<Search />} />
 
                         {/* Authentication */}
