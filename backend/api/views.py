@@ -349,18 +349,19 @@ class DashboardPostCommentAPIView(APIView):
         request_body=openapi.Schema(
             type=openapi.TYPE_OBJECT,
             properties={
-                'post_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'comment_id': openapi.Schema(type=openapi.TYPE_INTEGER),
                 'reply': openapi.Schema(type=openapi.TYPE_STRING),
             },
         ),
     )
     def post(self, request):
-        post_id = request.data['post_id']
+        comment_id = request.data['comment_id']
         reply = request.data['reply']
 
-        post = api_models.Post.objects.get(id=post_id)
-        comment = api_models.Comment.objects.get(post=post)
+        print("comment_id =======", comment_id)
+        print("reply ===========", reply)
 
+        comment = api_models.Comment.objects.get(id=comment_id)
         comment.reply = reply
         comment.save()
 

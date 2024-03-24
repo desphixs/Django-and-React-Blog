@@ -38,10 +38,6 @@ function Posts() {
                                                     <option value="">Sort by</option>
                                                     <option>Newest</option>
                                                     <option>Oldest</option>
-                                                    <option>------</option>
-                                                    <option>Active</option>
-                                                    <option>Draft</option>
-                                                    <option>Disabled</option>
                                                 </select>
                                             </form>
                                         </div>

@@ -22,28 +22,6 @@ function Comments() {
                                 </div>
                                 {/* Card body */}
                                 <div className="card-body">
-                                    {/* Form */}
-                                    <form className="row mb-4 gx-2">
-                                        <div className="col-xl-2 col-lg-2 col-md-4 col-12 mb-2 mb-lg-0">
-                                            {/* Custom select */}
-                                            <select className="form-select">
-                                                <option value="">Rating</option>
-                                                <option value={1}>1</option>
-                                                <option value={2}>2</option>
-                                                <option value={3}>3</option>
-                                                <option value={4}>4</option>
-                                                <option value={5}>5</option>
-                                            </select>
-                                        </div>
-                                        <div className="col-xl-3 col-lg-3 col-md-4 col-12 mb-2 mb-lg-0">
-                                            {/* Custom select */}
-                                            <select className="form-select">
-                                                <option value="">Sort by</option>
-                                                <option value="Newest">Newest</option>
-                                                <option value="Oldest">Oldest</option>
-                                            </select>
-                                        </div>
-                                    </form>
                                     {/* List group */}
                                     <ul className="list-group list-group-flush">
                                         {/* List group item */}
