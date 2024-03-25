@@ -149,7 +149,7 @@ class PostListAPIView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
     def get_queryset(self):
-        return api_models.Post.objects.filter(status="Active")
+        return api_models.Post.objects.all()
     
 class PostDetailAPIView(generics.RetrieveAPIView):
     serializer_class = api_serializer.PostSerializer
@@ -307,7 +307,7 @@ class DashboardPostLists(generics.ListAPIView):
         user_id = self.kwargs['user_id']
         user = api_models.User.objects.get(id=user_id)
 
-        return api_models.Post.objects.filter(user=user)
+        return api_models.Post.objects.filter(user=user).order_by("-id")
 
 class DashboardCommentLists(generics.ListAPIView):
     serializer_class = api_serializer.CommentSerializer
@@ -372,6 +372,7 @@ class DashboardPostCreateAPIView(generics.CreateAPIView):
     permission_classes = [AllowAny]
 
     def create(self, request, *args, **kwargs):
+        print(request.data)
         user_id = request.data.get('user_id')
         title = request.data.get('title')
         image = request.data.get('image')
@@ -379,6 +380,14 @@ class DashboardPostCreateAPIView(generics.CreateAPIView):
         tags = request.data.get('tags')
         category_id = request.data.get('category')
         post_status = request.data.get('post_status')
+
+        print(user_id)
+        print(title)
+        print(image)
+        print(description)
+        print(tags)
+        print(category_id)
+        print(post_status)
 
         user = api_models.User.objects.get(id=user_id)
         category = api_models.Category.objects.get(id=category_id)
@@ -394,8 +403,6 @@ class DashboardPostCreateAPIView(generics.CreateAPIView):
         )
 
         return Response({"message": "Post Created Successfully"}, status=status.HTTP_201_CREATED)
-
-
 
 class DashboardPostEditAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = api_serializer.PostSerializer
@@ -414,13 +421,21 @@ class DashboardPostEditAPIView(generics.RetrieveUpdateDestroyAPIView):
         image = request.data.get('image')
         description = request.data.get('description')
         tags = request.data.get('tags')
-        category_id = request.data.get('category_id')
+        category_id = request.data.get('category')
         post_status = request.data.get('post_status')
+
+        print(title)
+        print(image)
+        print(description)
+        print(tags)
+        print(category_id)
+        print(post_status)
 
         category = api_models.Category.objects.get(id=category_id)
 
         post_instance.title = title
-        post_instance.image = image
+        if image != "undefined":
+            post_instance.image = image
         post_instance.description = description
         post_instance.tags = tags
         post_instance.category = category

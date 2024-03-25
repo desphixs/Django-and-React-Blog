@@ -1,9 +1,108 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Header from "../partials/Header";
 import Footer from "../partials/Footer";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import apiInstance from "../../utils/axios";
+import useUserData from "../../plugin/useUserData";
+import Toast from "../../plugin/Toast";
+import Swal from "sweetalert2";
 
 function AddPost() {
+    const [post, setCreatePost] = useState({ image: "", title: "", description: "", category: parseInt(""), tags: "", status: "" });
+    const [imagePreview, setImagePreview] = useState("");
+    const [categoryList, setCategoryList] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const userId = useUserData()?.user_id;
+    const navigate = useNavigate();
+
+    const fetchCategory = async () => {
+        const response = await apiInstance.get(`post/category/list/`);
+        setCategoryList(response.data);
+        console.log(response.data);
+    };
+    useEffect(() => {
+        fetchCategory();
+    }, []);
+
+    const handleCreatePostChange = (event) => {
+        setCreatePost({
+            ...post,
+            [event.target.name]: event.target.value,
+        });
+    };
+
+    const handleFileChange = (event) => {
+        const selectedFile = event.target.files[0];
+        const reader = new FileReader();
+
+        setCreatePost({
+            ...post,
+            image: {
+                file: event.target.files[0],
+                preview: reader.result,
+            },
+        });
+        reader.onloadend = () => {
+            setImagePreview(reader.result);
+        };
+        if (selectedFile) {
+            reader.readAsDataURL(selectedFile);
+        }
+    };
+
+    console.log(post.image.file);
+
+    const handleCreatePost = async (e) => {
+        setIsLoading(true);
+        e.preventDefault();
+        if (!post.title || !post.description || !post.image) {
+            Toast("error", "All Fields Are Required To Create A Post");
+            setIsLoading(false);
+            return;
+        }
+
+        console.log(post.category);
+
+        const jsonData = {
+            user_id: userId,
+            title: post.title,
+            image: post.image.file,
+            description: post.description,
+            tags: post.tags,
+            category: post.category,
+            post_status: post.status,
+        };
+
+        const formdata = new FormData();
+
+        formdata.append("user_id", userId);
+        formdata.append("title", post.title);
+        formdata.append("image", post.image.file);
+        formdata.append("description", post.description);
+        formdata.append("tags", post.tags);
+        formdata.append("category", post.category);
+        formdata.append("post_status", post.status);
+        try {
+            const response = await apiInstance.post("author/dashboard/post-create/", formdata, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            });
+            console.log(response.data);
+            console.log("Post Create");
+            setIsLoading(false);
+            Swal.fire({
+                icon: "success",
+                title: "Post created successfully.",
+            });
+            navigate("/posts/");
+        } catch (error) {
+            console.log(error);
+            setIsLoading(false);
+        }
+    };
+
     return (
         <>
             <Header />
@@ -35,7 +134,7 @@ function AddPost() {
                                         </div>
                                     </div>
                                 </section>
-                                <section className="pb-8 mt-5">
+                                <form onSubmit={handleCreatePost} className="pb-8 mt-5">
                                     <div className="card mb-3">
                                         {/* Basic Info Section */}
                                         <div className="card-header border-bottom px-4 py-3">
@@ -45,45 +144,59 @@ function AddPost() {
                                             <label htmlFor="postTHumbnail" className="form-label">
                                                 Preview
                                             </label>
-                                            <img style={{ width: "100%", height: "330px", objectFit: "cover", borderRadius: "10px" }} className="mb-4" src="https://www.eclosio.ong/wp-content/uploads/2018/08/default.png" alt="" />
+                                            <img style={{ width: "100%", height: "330px", objectFit: "cover", borderRadius: "10px" }} className="mb-4" src={imagePreview || "https://www.eclosio.ong/wp-content/uploads/2018/08/default.png"} alt="" />
                                             <div className="mb-3">
                                                 <label htmlFor="postTHumbnail" className="form-label">
                                                     Thumbnail
                                                 </label>
-                                                <input id="postTHumbnail" className="form-control" type="file" />
+                                                <input onChange={handleFileChange} name="image" id="postTHumbnail" className="form-control" type="file" />
                                             </div>
 
                                             <div className="mb-3">
                                                 <label className="form-label">Title</label>
-                                                <input className="form-control" type="text" placeholder="" />
+                                                <input onChange={handleCreatePostChange} name="title" className="form-control" type="text" placeholder="" />
                                                 <small>Write a 60 character post title.</small>
                                             </div>
                                             <div className="mb-3">
                                                 <label className="form-label">Posts category</label>
-                                                <select className="form-select">
+                                                <select name="category" onChange={handleCreatePostChange} className="form-select">
                                                     <option value="">-------------</option>
-                                                    <option value="React">Lifstyle</option>
-                                                    <option value="Javascript">Fashion</option>
-                                                    <option value="HTML">Tech</option>
-                                                    <option value="Vue">Health</option>
-                                                    <option value="Gulp">Entertainment</option>
+                                                    {categoryList?.map((c, index) => (
+                                                        <option value={c?.id}>{c?.title}</option>
+                                                    ))}
                                                 </select>
                                                 <small>Help people find your posts by choosing categories that represent your post.</small>
                                             </div>
 
                                             <div className="mb-3">
                                                 <label className="form-label">Post Description</label>
-                                                <textarea name="" className="form-control" id="" cols="30" rows="10"></textarea>
+                                                <textarea onChange={handleCreatePostChange} name="description" className="form-control" id="" cols="30" rows="10"></textarea>
                                                 <small>A brief summary of your posts.</small>
                                             </div>
-                                            <label className="form-label">Tag</label>
-                                            <input className="form-control" type="number" placeholder="health, medicine, fitness" />
+                                            <label className="form-label">Tags</label>
+                                            <input onChange={handleCreatePostChange} name="tags" className="form-control" type="text" placeholder="health, medicine, fitness" />
+
+                                            <div className="mb-3">
+                                                <label className="form-label">Status</label>
+                                                <select onChange={handleCreatePostChange} name="status" className="form-select">
+                                                    <option value="Active">Active</option>
+                                                    <option value="Draft">Draft</option>
+                                                    <option value="Disabled">Disabled</option>
+                                                </select>
+                                                <small>Help people find your posts by choosing categories that represent your post.</small>
+                                            </div>
                                         </div>
                                     </div>
-                                    <button className="btn btn-lg btn-success w-100 mt-2" type="button">
-                                        Create Post <i className="fas fa-check-circle"></i>
-                                    </button>
-                                </section>
+                                    {isLoading === true ? (
+                                        <button className="btn btn-lg btn-secondary w-100 mt-2" disabled>
+                                            Creating Post... <i className="fas fa-spinner fa-spin"></i>
+                                        </button>
+                                    ) : (
+                                        <button className="btn btn-lg btn-success w-100 mt-2" type="submit">
+                                            Create Post <i className="fas fa-check-circle"></i>
+                                        </button>
+                                    )}
+                                </form>
                             </>
                         </div>
                     </div>

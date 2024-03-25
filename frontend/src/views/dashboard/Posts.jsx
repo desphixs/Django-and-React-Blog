@@ -98,6 +98,9 @@ function Posts() {
                                             <thead className="table-dark">
                                                 <tr>
                                                     <th scope="col" className="border-0 rounded-start">
+                                                        Image
+                                                    </th>
+                                                    <th scope="col" className="border-0 rounded-start">
                                                         Article Name
                                                     </th>
                                                     <th scope="col" className="border-0">
@@ -121,10 +124,15 @@ function Posts() {
                                                 {posts?.map((p, index) => (
                                                     <tr>
                                                         <td>
+                                                            <Link to={`/detail/${p.slug}/`}>
+                                                                <img src={p.image} style={{ width: "100px", height: "100px", objectFit: "cover", borderRadius: "10px" }} alt="" />
+                                                            </Link>
+                                                        </td>
+                                                        <td>
                                                             <h6 className="mt-2 mt-md-0 mb-0 ">
-                                                                <a href="#" className="text-dark text-decoration-none">
+                                                                <Link to={`/detail/${p.slug}/`} className="text-dark text-decoration-none">
                                                                     {p?.title}
-                                                                </a>
+                                                                </Link>
                                                             </h6>
                                                         </td>
                                                         <td>
@@ -141,12 +149,12 @@ function Posts() {
                                                         </td>
                                                         <td>
                                                             <div className="d-flex gap-2">
-                                                                <a href="#" className="btn-round mb-0 btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
-                                                                    <i className="bi bi-trash" />
-                                                                </a>
-                                                                <a href="dashboard-post-edit.html" className="btn btn-primary btn-round mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                                <Link to={`/edit-post/${p.id}/`} className="btn btn-primary btn-round mb-0" data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
                                                                     <i className="bi bi-pencil-square" />
-                                                                </a>
+                                                                </Link>
+                                                                <Link className="btn-round mb-0 btn btn-danger" data-bs-toggle="tooltip" data-bs-placement="top" title="Delete">
+                                                                    <i className="bi bi-trash" />
+                                                                </Link>
                                                             </div>
                                                         </td>
                                                     </tr>

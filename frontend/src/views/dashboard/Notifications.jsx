@@ -5,7 +5,6 @@ import { Link } from "react-router-dom";
 
 import apiInstance from "../../utils/axios";
 import useUserData from "../../plugin/useUserData";
-import moment from "moment";
 import Toast from "../../plugin/Toast";
 
 function Notifications() {
@@ -85,7 +84,7 @@ function Notifications() {
                                             </>
                                         ))}
 
-                                        {noti?.length && <p>No notifications yet</p>}
+                                        {noti?.length < 1 && <p>No notifications yet</p>}
                                     </ul>
                                 </div>
                             </div>
