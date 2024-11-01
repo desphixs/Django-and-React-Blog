@@ -368,8 +368,15 @@ class DashboardPostCommentAPIView(APIView):
 
 
 class AddRooms(generics.CreateAPIView):
-    serializer_class = api_serializer.PostSerializer
-    permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'user_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+                'room_name': openapi.Schema(type=openapi.TYPE_STRING),
+            },
+        ),
+    )
 
     def create(self, request, *args, **kwargs):
         room_name = request.data.get("room_name")
@@ -391,10 +398,24 @@ class AddRooms(generics.CreateAPIView):
         return Response({"message": "Room Created Successfully"},
                         status=status.HTTP_201_CREATED)
 class RoomsRemove(generics.CreateAPIView):
-    serializer_class = api_serializer.PostSerializer
-    permission_classes = [AllowAny]
+    @swagger_auto_schema(
+        request_body=openapi.Schema(
+            type=openapi.TYPE_OBJECT,
+            properties={
+                'room_id': openapi.Schema(type=openapi.TYPE_INTEGER),
+            },
+        ),
+    )
     def delete(self,request,*args, **kwargs):
-        arek=2
+        room_id = request.data.get("room_id")
+        if not room_id:
+            return Response({"error": "room_id is required."},)
+        try:
+            room = api_models.Rooms.objects.get(id=room_id)
+            room.delete()
+            return Response({"message": "Room Removed Successfully"},)
+        except api_models.Rooms.DoesNotExist:
+            return Response({"error": "Room Not Found"},)
 class DashboardPostCreateAPIView(generics.CreateAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
