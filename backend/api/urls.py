@@ -10,8 +10,7 @@ urlpatterns = [
     path('room/add/', api_views.AddRooms.as_view()),
     path('user/profile/<user_id>/', api_views.ProfileView.as_view(), name='user_profile'),
     path('user/password-reset/<email>/', api_views.PasswordEmailVerify.as_view(), name='password_reset'),
-    path('user/password-change/', api_views.PasswordChangeView.as_view(), name='password_reset'),
-
+    path('user/password-change/', api_views.PasswordChangeView.as_view(), name='password_reset'), #test git cm
     # Post Endpoints
     path('post/category/list/', api_views.CategoryListAPIView.as_view()),
     path('post/category/posts/<category_slug>/', api_views.PostCategoryListAPIView.as_view()),
