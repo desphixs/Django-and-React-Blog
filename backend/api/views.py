@@ -52,7 +52,6 @@ class ProfileView(generics.RetrieveUpdateAPIView):
 
     def get_object(self):
         user_id = self.kwargs['user_id']
-
         user = api_models.User.objects.get(id=user_id)
         profile = api_models.Profile.objects.get(user=user)
         return profile
@@ -366,24 +365,31 @@ class DashboardPostCommentAPIView(APIView):
         comment.save()
 
         return Response({"message": "Comment Response Sent"}, status=status.HTTP_201_CREATED)
+
+
 class AddRooms(generics.CreateAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
+
     def create(self, request, *args, **kwargs):
-        print(request.data)
-        user_id = self.kwargs['user_id']
-        post = api_models.Post.objects.create(
-            user=user,
-            title=title,
-            image=image,
-            description=description,
-            tags=tags,
-            category=category,
-            status=post_status
-        )
+        room_name = request.data.get("room_name")
+        user_id = request.data.get("user_id")
 
-        return Response({"message": "Post Created Successfully"}, status=status.HTTP_201_CREATED)
+        if not room_name or not user_id:
+            return Response({"error": "room_name and user_id are required."},
+                            status=status.HTTP_400_BAD_REQUEST)
 
+        try:
+            user = api_models.User.objects.get(id=user_id)
+        except api_models.User.DoesNotExist:
+            return Response({"error": "User not found"},
+                            status=status.HTTP_404_NOT_FOUND)
+
+        room = api_models.Rooms.objects.create(name=room_name)
+        room.users.add(user)
+
+        return Response({"message": "Room Created Successfully"},
+                        status=status.HTTP_201_CREATED)
 class DashboardPostCreateAPIView(generics.CreateAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
@@ -397,15 +403,6 @@ class DashboardPostCreateAPIView(generics.CreateAPIView):
         tags = request.data.get('tags')
         category_id = request.data.get('category')
         post_status = request.data.get('post_status')
-
-        print(user_id)
-        print(title)
-        print(image)
-        print(description)
-        print(tags)
-        print(category_id)
-        print(post_status)
-        print("xd")
         user = api_models.User.objects.get(id=user_id)
         category = api_models.Category.objects.get(id=category_id)
 

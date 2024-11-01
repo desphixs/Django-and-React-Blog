@@ -7,7 +7,7 @@ urlpatterns = [
     path('user/token/', api_views.MyTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('user/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('user/register/', api_views.RegisterView.as_view(), name='auth_register'),
-    path('room/add/',api_views.AddRooms.as_view()),
+    path('room/add/', api_views.AddRooms.as_view()),
     path('user/profile/<user_id>/', api_views.ProfileView.as_view(), name='user_profile'),
     path('user/password-reset/<email>/', api_views.PasswordEmailVerify.as_view(), name='password_reset'),
     path('user/password-change/', api_views.PasswordChangeView.as_view(), name='password_reset'),
