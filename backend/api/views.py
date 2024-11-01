@@ -390,6 +390,11 @@ class AddRooms(generics.CreateAPIView):
 
         return Response({"message": "Room Created Successfully"},
                         status=status.HTTP_201_CREATED)
+class RoomsRemove(generics.CreateAPIView):
+    serializer_class = api_serializer.PostSerializer
+    permission_classes = [AllowAny]
+    def delete(self,request,*args, **kwargs):
+        arek=2
 class DashboardPostCreateAPIView(generics.CreateAPIView):
     serializer_class = api_serializer.PostSerializer
     permission_classes = [AllowAny]
