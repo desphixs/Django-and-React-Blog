@@ -23,6 +23,8 @@ class BookmarkAdmin(admin.ModelAdmin):
 
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ["user","post","type","seen",]
+class RoomsAdmin(admin.ModelAdmin):
+    list_display = ["id","name"]
 
 admin.site.register(api_models.User, UserAdmin)
 admin.site.register(api_models.Profile, ProfileAdmin)
@@ -31,3 +33,4 @@ admin.site.register(api_models.Post, PostAdmin)
 admin.site.register(api_models.Comment, CommentAdmin)
 admin.site.register(api_models.Notification, NotificationAdmin)
 admin.site.register(api_models.Bookmark, BookmarkAdmin)
+admin.site.register(api_models.Rooms, RoomsAdmin)
